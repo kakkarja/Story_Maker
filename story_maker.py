@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+# Copyright © kakkarja (K A K)
 
 from tkinter import ttk, Text
 
