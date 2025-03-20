@@ -1,0 +1,10 @@
+
+.DS_Store
+*.pyc
+.vscode/
+build/
+dist/
+*.egg*/
+Archive*/
+*.icloud
+__pycache__/
