@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 # Copyright © kakkarja (K A K)
 
-from tkinter import Tk, ttk
-from story_maker import BeginningStory, MultipleChoices, MultipleStories, SaveButton
+from tkinter import Tk
+from .story_structure import BeginningStory, MultipleChoices, MultipleStories, SaveLoadButton
+
 
 class MainFrame(Tk):
     """The Story Maker"""
@@ -11,11 +12,16 @@ class MainFrame(Tk):
         super().__init__()
         self.beginning = BeginningStory(self)
         self.multiple_choices_first = MultipleChoices(self, "First Multiple Choices")
-        self.multiple_stories_second = MultipleStories(self, "Second stories")
+        self.multiple_stories_first = MultipleStories(self, "First Stories")
         self.multiple_choices_second = MultipleChoices(self, "Second Multiple Choices")
-        self.multiple_stories_third = MultipleStories(self, "Third Stories")
+        self.multiple_stories_second = MultipleStories(self, "Second Stories")
         self.scriptures = MultipleStories(self, "Scriptures", True)
-        self.button = SaveButton(self, "Save", self.stories_formats)
+        self.button = SaveLoadButton(self, 
+            {
+                "save": self.stories_formats, 
+                "load": self.stories_formats
+            }
+        )
 
     def stories_formats(self):
         print("Test")
@@ -28,7 +34,3 @@ class MainFrame(Tk):
 def main():
     story = MainFrame()
     story.mainloop()
-
-
-if __name__ == "__main__":
-    main()

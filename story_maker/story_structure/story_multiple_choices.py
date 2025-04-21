@@ -1,0 +1,33 @@
+# -*- coding: utf-8 -*-
+# Copyright © kakkarja (K A K)
+
+from tkinter import ttk
+
+__all__ = [""]
+
+
+class MultipleChoices(ttk.LabelFrame):
+    """Multiple Choices"""
+
+    def __init__(self, root, judul: str):
+        super().__init__()
+
+        self.config(text=judul)
+        self.pack(fill="x")
+        self.left_frame = ttk.Frame(self)
+        self.left_frame.pack(fill="x", expand=1)
+
+        self.lif_left_choice = ttk.LabelFrame(self.left_frame, text="A", labelanchor="w")
+        self.lif_left_choice.pack(side="left", fill="x", expand=1)
+        self.entry_a = ttk.Entry(self.lif_left_choice)
+        self.entry_a.pack(fill="x", expand=1)
+
+        self.lif_mid_choice = ttk.LabelFrame(self.left_frame, text="B", labelanchor="w")
+        self.lif_mid_choice.pack(side="left", fill="x", expand=1)
+        self.entry_b = ttk.Entry(self.lif_mid_choice)
+        self.entry_b.pack(fill="x", expand=1)
+
+        self.lif_right_choice = ttk.LabelFrame(self.left_frame, text="C", labelanchor="w")
+        self.lif_right_choice.pack(side="left", fill="x", expand=1)
+        self.entry_c = ttk.Entry(self.lif_right_choice)
+        self.entry_c.pack(fill="x", expand=1)
