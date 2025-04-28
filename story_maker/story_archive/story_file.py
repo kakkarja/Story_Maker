@@ -4,72 +4,57 @@
 import json
 import os
 from pathlib import Path
-from enum import StrEnum
 from zipfile import is_zipfile, ZipFile
+from story_data import StoryFilesData
 
 
-Test = """
-            3 Files:
-            - stories
-            - choices
-            - scriptures
-
-            These files are json formats:
-            Stories - 
-            {"stories": {
-                    "begin": "......",
-                    "first": {
-                        "A": ".....",
-                        "B": ".....",
-                        "C": ".....",
-                    },
-                    "second": {
-                        "A": ".....",
-                        "B": ".....",
-                        "C": ".....",
-                    }
-                }
-            }
-
-            Choices -
-            {"choices":
-                { 
-                    "first": {
-                        "A": ".....",
-                        "B": ".....",
-                        "C": ".....",
-                    },
-                    "second": {
-                        "A": ".....",
-                        "B": ".....",
-                        "C": ".....",
-                    }
-                }
-            }
-
-            Scriptures -
-            {"scriptures":
-                {
-                    "A": ".....",
-                    "B": ".....",
-                }
-            }
 """
+    3 Files:
+    - stories
+    - choices
+    - scriptures
 
-class Choices(StrEnum):
-    A = "A"
-    B = "B"
-    C = "C"
+    These files are json formats:
+    Stories - 
+    {"stories": {
+            "begin": "......",
+            "first": {
+                "A": ".....",
+                "B": ".....",
+                "C": ".....",
+            },
+            "second": {
+                "A": ".....",
+                "B": ".....",
+                "C": ".....",
+            }
+        }
+    }
 
+    Choices -
+    {"choices":
+        { 
+            "first": {
+                "A": ".....",
+                "B": ".....",
+                "C": ".....",
+            },
+            "second": {
+                "A": ".....",
+                "B": ".....",
+                "C": ".....",
+            }
+        }
+    }
 
-class StoryFilesData:
-
-    def __init__(self, stories: dict[str, str], choices: dict[str, str], scriptures: dict[str, str]):
-        self.stories = stories
-        self.choices = choices
-        self.scriptures = scriptures
-
-    
+    Scriptures -
+    {"scriptures":
+        {
+            "A": ".....",
+            "B": ".....",
+        }
+    }
+""" 
 
 class StoryFilesArchive(StoryFilesData):
     """Archiving files of Stories, with Json format"""
@@ -133,10 +118,11 @@ class StoryFilesSets:
 if __name__ == "__main__":
 
     path = Path(__file__).parent
+    os.chdir(path=path)
     data = StoryFilesData({"Stories": "..."}, {"choices": "..."}, {"scriptures": "..."})
     story = StoryFilesArchive(
         path, stories=data.stories, choices=data.choices, scriptures=data.scriptures
     )
     # story.archiving_zip("test")
     # story.unarchived_zip("test")
-    story.deleting_files()
+    # story.deleting_files()

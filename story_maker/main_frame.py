@@ -10,6 +10,16 @@ class MainFrame(Tk):
     
     def __init__(self):
         super().__init__()
+        self.stories = {"stories": {
+            "begin": "",
+            "first": "",
+            "second": "",
+        }}
+        self.choices = {"choices":{
+            "first": "",
+            "second": "",
+        }}
+        self.scriptures = {"scriptures": ""}
         self.beginning = BeginningStory(self)
         self.multiple_choices_first = MultipleChoices(self, "First Multiple Choices")
         self.multiple_stories_first = MultipleStories(self, "First Stories")
@@ -22,6 +32,12 @@ class MainFrame(Tk):
                 "load": self.stories_formats
             }
         )
+    def _begin_story(self):
+        if bg := self.beginning.format_begin():
+            self.stories["stories"]["begin"] = bg["begin"]
+
+    def _multiple_s(self):
+        pass
 
     def stories_formats(self):
         print("Test")
@@ -32,5 +48,4 @@ class MainFrame(Tk):
 
 
 def main():
-    story = MainFrame()
-    story.mainloop()
+    MainFrame().mainloop()

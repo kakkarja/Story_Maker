@@ -31,3 +31,14 @@ class MultipleChoices(ttk.LabelFrame):
         self.lif_right_choice.pack(side="left", fill="x", expand=1)
         self.entry_c = ttk.Entry(self.lif_right_choice)
         self.entry_c.pack(fill="x", expand=1)
+
+    def format_choices(self) -> (dict[str, str] | None):
+
+        entries = [self.entry_a.get(), self.entry_b.get(), self.entry_c.get()]
+
+        if all(entries):
+            return {
+                "A": entries[0],
+                "B": entries[1],
+                "C": entries[2],
+            }

@@ -11,6 +11,7 @@ class MultipleStories(ttk.LabelFrame):
 
     def __init__(self, root, judul: str, skipped: bool = False):
         super().__init__()
+        self.skipped = skipped
 
         self.config(text=judul)
         self.pack(fill="both", expand=1)
@@ -33,7 +34,7 @@ class MultipleStories(ttk.LabelFrame):
         self.text_b.configure(yscrollcommand=self.scrollbar.set)
         self.scrollbar.pack(side="right", fill="y")
 
-        if not skipped:
+        if not self.skipped:
             self.lif_right_choice = ttk.LabelFrame(self.left_frame, text="C", labelanchor="w")
             self.lif_right_choice.pack(fill="both", expand=1)
             self.text_c = Text(self.lif_right_choice, height=1, wrap="word")
@@ -41,3 +42,28 @@ class MultipleStories(ttk.LabelFrame):
             self.scrollbar = ttk.Scrollbar(self.lif_right_choice, orient="vertical", command=self.text_c.yview)
             self.text_c.configure(yscrollcommand=self.scrollbar.set)
             self.scrollbar.pack(side="right", fill="y")
+
+    def format_stories(self) -> (dict[str, str] | None):
+
+        if not self.skipped:
+            stories = [
+            self.text_a.get("1.0", "end")[:-1],
+            self.text_b.get("1.0", "end")[:-1],
+            self.text_c.get("1.0", "end")[:-1]
+            ]
+            if all(stories):
+                return {
+                    "A": stories[0],
+                    "B": stories[1],
+                    "c": stories[2],
+                }
+        else:
+            stories = [
+            self.text_a.get("1.0", "end")[:-1],
+            self.text_b.get("1.0", "end")[:-1],
+            ]
+            if all(stories):
+                return {
+                    "A": stories[0],
+                    "B": stories[1],
+                }

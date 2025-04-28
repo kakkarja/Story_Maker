@@ -21,3 +21,7 @@ class BeginningStory(ttk.LabelFrame):
         self.scrollbar = ttk.Scrollbar(self.frame_top, orient="vertical", command=self.begin.yview)
         self.begin.configure(yscrollcommand=self.scrollbar.set)
         self.scrollbar.pack(side="right", fill="y")
+
+    def format_begin(self) -> (dict[str, str] | None):
+        if self.begin.get("1.0", "end")[:-1]:
+            return {"begin": self.begin.get("1.0", "end")[:-1]}
