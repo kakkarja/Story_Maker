@@ -24,4 +24,11 @@ class BeginningStory(ttk.LabelFrame):
 
     def format_begin(self) -> (dict[str, str] | None):
         if self.begin.get("1.0", "end")[:-1]:
-            return {"begin": self.begin.get("1.0", "end")[:-1]}
+            return {"begin": self.begin.get("1.0", "end")[:-1].strip()}
+        
+    def delete_text(self):
+        self.begin.delete("1.0", "end")
+
+    def insert_text(self, format_: dict[str|str]):
+        self.delete_text()
+        self.begin.insert("1.0", format_["begin"])

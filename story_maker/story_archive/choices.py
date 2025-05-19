@@ -8,3 +8,7 @@ class Choices(StrEnum):
     A = "A"
     B = "B"
     C = "C"
+
+if __name__ == "__main__":
+    c = Choices("A")
+    print(f"{c}")

@@ -45,25 +45,49 @@ class MultipleStories(ttk.LabelFrame):
 
     def format_stories(self) -> (dict[str, str] | None):
 
-        if not self.skipped:
-            stories = [
-            self.text_a.get("1.0", "end")[:-1],
-            self.text_b.get("1.0", "end")[:-1],
-            self.text_c.get("1.0", "end")[:-1]
-            ]
-            if all(stories):
+        stories = [
+        self.text_a.get("1.0", "end")[:-1].strip(),
+        self.text_b.get("1.0", "end")[:-1].strip(),
+        self.text_c.get("1.0", "end")[:-1].strip(),
+        ] if not self.skipped else [
+        self.text_a.get("1.0", "end")[:-1].strip(),
+        self.text_b.get("1.0", "end")[:-1].strip(),
+        ]
+        if all(stories):
+            if len(stories) == 3:
                 return {
                     "A": stories[0],
                     "B": stories[1],
-                    "c": stories[2],
+                    "C": stories[2],
                 }
-        else:
-            stories = [
-            self.text_a.get("1.0", "end")[:-1],
-            self.text_b.get("1.0", "end")[:-1],
-            ]
-            if all(stories):
+            else:
                 return {
                     "A": stories[0],
                     "B": stories[1],
                 }
+    
+    def delete_all(self):
+        stories = [
+            self.text_a, self.text_b, self.text_c,
+        ] if not self.skipped else [
+            self.text_a, self.text_b,
+        ]
+        
+        for story in stories:
+            story.delete("1.0", "end")
+    
+    def insert_text(self, format_: dict[str|str]):
+        self.delete_all()
+        stories = [
+            self.text_a, self.text_b, self.text_c,
+        ] if not self.skipped else [
+            self.text_a, self.text_b,
+        ]
+        sentences = [
+            format_["A"], format_["B"], format_["C"]
+        ] if not self.skipped else [
+            format_["A"], format_["B"]
+        ]
+        for story, sentence in zip(stories, sentences):
+            story.insert("1.0", sentence)
+        del stories, sentences

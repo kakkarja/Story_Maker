@@ -34,7 +34,7 @@ class MultipleChoices(ttk.LabelFrame):
 
     def format_choices(self) -> (dict[str, str] | None):
 
-        entries = [self.entry_a.get(), self.entry_b.get(), self.entry_c.get()]
+        entries = [self.entry_a.get().strip(), self.entry_b.get().strip(), self.entry_c.get().strip()]
 
         if all(entries):
             return {
@@ -42,3 +42,17 @@ class MultipleChoices(ttk.LabelFrame):
                 "B": entries[1],
                 "C": entries[2],
             }
+    
+    def delete_all(self):
+        entries = [self.entry_a, self.entry_b, self.entry_c]
+        for entry in entries:
+            entry.delete(0, "end")
+        del entries
+    
+    def insert_text(self, format_: dict[str|str]):
+        self.delete_all()
+        entries = [self.entry_a, self.entry_b, self.entry_c]
+        texts = [format_["A"], format_["B"], format_["C"]]
+        for entry, text in zip(entries, texts):
+            entry.insert(0, text)
+        del entries, text

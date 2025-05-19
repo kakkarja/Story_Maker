@@ -5,8 +5,10 @@ import json
 import os
 from pathlib import Path
 from zipfile import is_zipfile, ZipFile
-from story_data import StoryFilesData
-
+try:
+    from .story_data import StoryFilesData
+except:
+    from story_data import StoryFilesData
 
 """
     3 Files:
@@ -59,8 +61,11 @@ from story_data import StoryFilesData
 class StoryFilesArchive(StoryFilesData):
     """Archiving files of Stories, with Json format"""
 
-    def __init__(self, path: str, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, path: str, *args):
+        if args:
+            super().__init__(*args)
+        else:
+            super().__init__(None, None, None)
         self.path = Path(path)
         
 
@@ -71,10 +76,10 @@ class StoryFilesArchive(StoryFilesData):
         list_files = []
         for k, v in files.items():
             pth = self.path.joinpath(f"{k}.json")
-            if not pth.exists():
+            if not pth.exists() and v:
                 with open(pth, "w") as story:
                     json.dump(v, story)
-            list_files.append(pth)
+                list_files.append(pth)
             del pth
         return list_files
     
@@ -93,36 +98,17 @@ class StoryFilesArchive(StoryFilesData):
         """Archiving story to a zip file for loading or deleting all json files"""
 
         if not is_zipfile(self.path.joinpath(f"{name}.zip")):
-            with ZipFile(self.path.joinpath(f"{name}.zip"), "x") as zipped:
-                for file in self.creating_files():
-                    zipped.write(file.name)
-            self.deleting_files()
+            if files := self.creating_files():
+                with ZipFile(self.path.joinpath(f"{name}.zip"), "x") as zipped: 
+                    for file in files:
+                        zipped.write(file.name)
+                self.deleting_files()
 
     def unarchived_zip(self, name: str):
         """Extracting file from a zip file"""
         
         if is_zipfile(self.path.joinpath(f"{name}.zip")):
             with ZipFile(self.path.joinpath(f"{name}.zip")) as zipped:
-                for file in self.creating_files():
-                    zipped.extract(file.name)
-
-
-class StoryFilesLoads:
-    pass
-
-
-class StoryFilesSets:
-    pass
-
-
-if __name__ == "__main__":
-
-    path = Path(__file__).parent
-    os.chdir(path=path)
-    data = StoryFilesData({"Stories": "..."}, {"choices": "..."}, {"scriptures": "..."})
-    story = StoryFilesArchive(
-        path, stories=data.stories, choices=data.choices, scriptures=data.scriptures
-    )
-    # story.archiving_zip("test")
-    # story.unarchived_zip("test")
-    # story.deleting_files()
+                for file in zipped.filelist:
+                    zipped.extract(file)
+                    

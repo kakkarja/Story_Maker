@@ -1,1 +1,2 @@
-from .main_frame import main
+from .main_frame import story_maker
+from .blessing_pro import main
