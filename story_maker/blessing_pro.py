@@ -7,7 +7,7 @@ Created on Thu Apr  5 11:23:58 2018
 
 from tkinter import *
 from tkinter import ttk
-from tkinter import simpledialog
+# from tkinter import simpledialog
 import tkinter.filedialog as fil
 import tkinter.messagebox as mes
 import webbrowser
@@ -183,29 +183,30 @@ class Bless(S_at):
                 
     # Filling stories parts into 9 set of class properties    
     def story(self):
-        
-        self.docr = []
-        with chdir(self.h_path):
-            self.docr.extend(StoryFilesLoads(self.h_path).data_extract(self.combo.get()))
 
+        if story := self.combo.get():
+            with chdir(self.h_path):
+                self.docr.extend(StoryFilesLoads(self.h_path).data_extract(story))
 
-        # Setting up story to be run later on 
-        S_at.pre = self.docr[0]["stories"]["begin"] + "\n"  
-        S_at.q1 = [f"{k}. {v}" for k, v in self.docr[1]["choices"]["first"].items()]
-        
-        S_at.q2 = [f"{k}. {v}" for k, v in self.docr[1]["choices"]["second"].items()]
-        
-        S_at.q1_ansA = self.docr[0]["stories"]["first"]["A"] + "\n"
-        
-        S_at.q1_ansB = self.docr[0]["stories"]["first"]["B"] + "\n"
-        
-        S_at.q1_ansC = self.docr[0]["stories"]["first"]["C"] + "\n"
-        
-        S_at.q2_ansA = self.docr[0]["stories"]["second"]["A"] + "\n"
-        
-        S_at.q2_ansB = self.docr[0]["stories"]["second"]["B"] + "\n"
-        
-        S_at.q2_ansC = self.docr[0]["stories"]["second"]["C"] + "\n"
+            # Setting up story to be run later on 
+            S_at.pre = self.docr[0]["stories"]["begin"] + "\n"  
+            S_at.q1 = [f"{k}. {v}" for k, v in self.docr[1]["choices"]["first"].items()]
+            
+            S_at.q2 = [f"{k}. {v}" for k, v in self.docr[1]["choices"]["second"].items()]
+            
+            S_at.q1_ansA = self.docr[0]["stories"]["first"]["A"] + "\n"
+            
+            S_at.q1_ansB = self.docr[0]["stories"]["first"]["B"] + "\n"
+            
+            S_at.q1_ansC = self.docr[0]["stories"]["first"]["C"] + "\n"
+            
+            S_at.q2_ansA = self.docr[0]["stories"]["second"]["A"] + "\n"
+            
+            S_at.q2_ansB = self.docr[0]["stories"]["second"]["B"] + "\n"
+            
+            S_at.q2_ansC = self.docr[0]["stories"]["second"]["C"] + "\n"
+        else:
+            mes.showinfo("Blessing Project", "Please choose story from the list!", parent=self.root)
         
     # Starting first part of a story
     def s_story1(self):
@@ -234,20 +235,20 @@ class Bless(S_at):
     # Clear function for starting new story afresh    
     def clear(self):
         self.docr = []
-        self.fix_1=[]
-        self.fix_2=[]
         self.text_conf(True)
         self.stbox.delete("1.0", "end")
-        self.rb1.config(state = "normal")
-        self.rb2.config(state = "normal")
-        self.rb3.config(state = "normal")
+        if bool(self.combo.get()):
+            self.rb1.config(state = "normal")
+            self.rb2.config(state = "normal")
+            self.rb3.config(state = "normal")
         self.st1.set(1)
 
     # Start the story
     def start_story(self,event = None):
         self.clear()
         self.story()
-        self.s_story1()
+        if self.docr:
+            self.s_story1()
         self.text_conf()
     
     # Link to lWW Github page
@@ -304,7 +305,7 @@ class Bless(S_at):
     
     # Refresh list of files in BP
     def refresh(self, event = None):
-        pass
+        self.start_story()
 
     # Dictionary Function
     def trans(self, event = None):
