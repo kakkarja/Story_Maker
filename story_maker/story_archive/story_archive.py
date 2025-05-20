@@ -97,12 +97,16 @@ class StoryFilesArchive(StoryFilesData):
     def archiving_zip(self, name: str):
         """Archiving story to a zip file for loading or deleting all json files"""
 
-        if not is_zipfile(self.path.joinpath(f"{name}.zip")):
-            if files := self.creating_files():
+        if files := self.creating_files():
+            if not is_zipfile(self.path.joinpath(f"{name}.zip")):        
                 with ZipFile(self.path.joinpath(f"{name}.zip"), "x") as zipped: 
                     for file in files:
+                        zipped.write(file.name)                
+            else:
+                with ZipFile(self.path.joinpath(f"{name}.zip"), "w") as zipped: 
+                    for file in files:
                         zipped.write(file.name)
-                self.deleting_files()
+            self.deleting_files()
 
     def unarchived_zip(self, name: str):
         """Extracting file from a zip file"""

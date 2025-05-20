@@ -38,6 +38,7 @@ class MainFrame(Tk):
             }
         )
         self.bind_all("<Control-d>", self.stories_delete)
+        self.name_to_save = ""
         self.checking_dir()
 
     def _begin_story(self):
@@ -98,7 +99,11 @@ class MainFrame(Tk):
             self.checking_scriptures()
         ]
         if all(checking):
-            ask = simpledialog.askstring("Story Maker", "Name of file:", parent=self)
+            ask = (
+                simpledialog.askstring("Story Maker", "Name of file:", parent=self) 
+                if not self.name_to_save else
+                self.name_to_save
+            )
             if ask:
                 data = [self.stories, self.choices, self.scriptures]
                 archive = StoryFilesArchive(self.path, *data)    
@@ -118,6 +123,7 @@ class MainFrame(Tk):
             self.multiple_choices_second.insert_text(stores[1]["choices"]["second"])
             self.multiple_stories_second.insert_text(stores[0]["stories"]["second"])
             self.scriptures_.insert_text(stores[2]["scriptures"])
+            self.name_to_save = ask
             del stores
         
 

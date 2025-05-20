@@ -5,14 +5,15 @@ Created on Thu Apr  5 11:23:58 2018
 @author: karja
 """
 
-from tkinter import *
-from tkinter import ttk
-# from tkinter import simpledialog
-import tkinter.filedialog as fil
-import tkinter.messagebox as mes
+from tkinter import (
+    Menu, StringVar, Frame, Scrollbar, 
+    Text, Radiobutton, TOP, BOTTOM, BOTH, 
+    RIGHT, LEFT, END, Tk, ttk, 
+    filedialog as fil,
+    messagebox as mes
+)
 import webbrowser
 from pathlib import Path
-from textwrap import fill
 from contextlib import chdir
 try:
     from .story_archive import StoryFilesLoads, Choices
@@ -99,11 +100,13 @@ class Bless(S_at):
         self.frame.pack(side = BOTTOM, fill = BOTH, expand = True)
         self.scr = Scrollbar(self.frame)
         self.scr.pack(side = RIGHT, fill = BOTH, pady = 2, padx = 1)
-        self.stbox = Text(self.frame, relief = 'sunken')
+        self.stbox = Text(self.frame, relief = 'sunken', wrap="word")
         self.stbox.pack(side = LEFT, fill = BOTH, expand = True,
                         padx = 2, pady = 2)
         self.scr.config(command=self.stbox.yview)
-        self.stbox.config(yscrollcommand=self.scr.set)
+        self.stbox.config(
+            yscrollcommand=self.scr.set, font=("Avenir", "12", "bold")
+        )
         # self.bttr = Button(root, text = 'Dictionary', command = self.trans, 
         #                    relief = 'groove')
         # self.bttr.pack(side='left', padx = 3, pady = 2)
@@ -119,11 +122,9 @@ class Bless(S_at):
                             value = 'C', compound=LEFT, 
                             command = self.choice, tristatevalue = 0)
         self.rb3.pack(side='left', expand = True)
-        self.rb1.config(state = 'disable')
-        self.rb2.config(state = 'disable')
-        self.rb3.config(state = 'disable')
+        self._set_combo(False)
     
-    def text_conf(self, editable=False):
+    def _text_conf(self, editable=False):
         if not editable:
             self.stbox.config(state="disabled")
         else:
@@ -131,7 +132,7 @@ class Bless(S_at):
 
     # Choices function for choosing A/B/C    
     def choice(self, event = None):
-        self.text_conf(True)
+        self._text_conf(True)
         self.asw = Choices(self.st1.get())
         match self.cycle:
             case 1:
@@ -147,39 +148,25 @@ class Bless(S_at):
                     self.s_story3()
                 self.cycle += 1
         if self.cycle == 3:
-            self.rb1.config(state = "disabled")
-            self.rb2.config(state = "disabled")
-            self.rb3.config(state = "disabled")
+            self._set_combo(False)
             self.cycle = 1
-        self.text_conf()
+        self._text_conf()
                     
+    def _insert_answer(self, part: int, ans: str, sentences: str):
+        ending = "\nThe End" if ans == 'C' else ''
+        double = "\n\n" if part == 2 else "\n"
+        self.stbox.insert(END, f"{double}Choose: {ans}\n")
+        self.stbox.insert(END, f"\n{sentences}{ending}")
+        del ending, double, part, ans, sentences
+
     # Answering function        
     def get_ans(self, ans=None, part=None):
         
-        if part == 1:
-            if ans == "A":
-                self.stbox.insert(END, '\n' + 'Choose: ' + 'A\n')
-                self.stbox.insert(END, '\n' + fill(str(self.q1_ansA)))
-            elif ans == "B":
-                self.stbox.insert(END, '\n' + 'Choose: ' + 'B\n')
-                self.stbox.insert(END, '\n' + fill(str(self.q1_ansB)))
-            elif ans == "C":
-                self.stbox.insert(END, '\n' + 'Choose: ' + 'C\n')
-                self.stbox.insert(END, '\n' + fill(str(self.q1_ansC)) + '\nThe End')
-                
-        elif part == 2:
-            if ans == "A":
-                self.stbox.insert(END, '\n')
-                self.stbox.insert(END, '\n' + 'Choose: ' + 'A\n')
-                self.stbox.insert(END, '\n' + fill(str(self.q2_ansA)))
-            elif ans == "B":
-                self.stbox.insert(END, '\n')
-                self.stbox.insert(END, '\n' + 'Choose: ' + 'B\n')
-                self.stbox.insert(END, '\n' + fill(str(self.q2_ansB)))
-            elif ans == "C":
-                self.stbox.insert(END, '\n')
-                self.stbox.insert(END, '\n' + 'Choose: ' + 'C\n')
-                self.stbox.insert(END, '\n' + fill(str(self.q2_ansC)) + '\nThe End')
+        match part:
+            case 1:
+                self._insert_answer(part, ans, self.docr[0]["stories"]["first"][ans])
+            case 2:
+                self._insert_answer(part, ans, self.docr[0]["stories"]["second"][ans])
                 
     # Filling stories parts into 9 set of class properties    
     def story(self):
@@ -187,60 +174,42 @@ class Bless(S_at):
         if story := self.combo.get():
             with chdir(self.h_path):
                 self.docr.extend(StoryFilesLoads(self.h_path).data_extract(story))
-
-            # Setting up story to be run later on 
-            S_at.pre = self.docr[0]["stories"]["begin"] + "\n"  
-            S_at.q1 = [f"{k}. {v}" for k, v in self.docr[1]["choices"]["first"].items()]
-            
-            S_at.q2 = [f"{k}. {v}" for k, v in self.docr[1]["choices"]["second"].items()]
-            
-            S_at.q1_ansA = self.docr[0]["stories"]["first"]["A"] + "\n"
-            
-            S_at.q1_ansB = self.docr[0]["stories"]["first"]["B"] + "\n"
-            
-            S_at.q1_ansC = self.docr[0]["stories"]["first"]["C"] + "\n"
-            
-            S_at.q2_ansA = self.docr[0]["stories"]["second"]["A"] + "\n"
-            
-            S_at.q2_ansB = self.docr[0]["stories"]["second"]["B"] + "\n"
-            
-            S_at.q2_ansC = self.docr[0]["stories"]["second"]["C"] + "\n"
         else:
             mes.showinfo("Blessing Project", "Please choose story from the list!", parent=self.root)
         
     # Starting first part of a story
     def s_story1(self):
-        self.stbox.insert("1.0", str(fill(self.pre) + '\n'+'\n'))
-        for i in self.q1:
+        self.stbox.insert("1.0", f"{self.docr[0]["stories"]["begin"]}\n\n")
+        for i in [
+            f"{k}. {v}" for k, v in self.docr[1]["choices"]["first"].items()
+        ]:
             self.stbox.insert(END, i+'\n')
 
     # 2nd part of a story
     def s_story2(self):
         self.stbox.insert(END, '\n')
-        for i in self.q2:
+        for i in [
+            f"{k}. {v}" for k, v in self.docr[1]["choices"]["second"].items()
+        ]:
             self.stbox.insert(END, '\n' + i )
-            self.st1.set(1)
-     
+        self.st1.set(1)
+
     # 3rd of a story           
     def s_story3(self):
-        if self.asw == "A":
-            w = self.docr[2]["scriptures"]["A"] + "\n" 
-            self.stbox.insert(END, '\n')
-            self.stbox.insert(END, '\n' + str(fill(w.upper(),73)) )
-        elif self.asw == "B":
-            w = self.docr[2]["scriptures"]["B"] + "\n"
-            self.stbox.insert(END, '\n')
-            self.stbox.insert(END, '\n' + str(fill(w.upper(),73)) )
+         self.stbox.insert(END, f"\n\n{self.docr[2]["scriptures"][self.asw].upper()}")
+    
+    def _set_combo(self, normal: bool = True):
+        state = "normal" if normal else "disabled"
+        self.rb1.config(state=state)
+        self.rb2.config(state=state)
+        self.rb3.config(state=state)
     
     # Clear function for starting new story afresh    
     def clear(self):
         self.docr = []
-        self.text_conf(True)
+        self._text_conf(True)
         self.stbox.delete("1.0", "end")
-        if bool(self.combo.get()):
-            self.rb1.config(state = "normal")
-            self.rb2.config(state = "normal")
-            self.rb3.config(state = "normal")
+        self._set_combo(bool(self.combo.get()))
         self.st1.set(1)
 
     # Start the story
@@ -249,7 +218,7 @@ class Bless(S_at):
         self.story()
         if self.docr:
             self.s_story1()
-        self.text_conf()
+        self._text_conf()
     
     # Link to lWW Github page
     def about(self):
@@ -266,17 +235,16 @@ class Bless(S_at):
         self.stbox.event_generate("<<Copy>>")   
     
     def paste(self, event = None):
-        self.text_conf(True)
+        self._text_conf(True)
         self.stbox.event_generate("<<Paste>>")
-        self.text_conf()
-            
-    
+        self._text_conf()
+
     # Generate Delete Function
     def dele(self, event = None):
-        self.text_conf(True)
+        self._text_conf(True)
         self.select_all()
         self.stbox.event_generate("<<Clear>>")
-        self.text_conf()
+        self._text_conf()
     
     # Generate Exit Function
     def ex(self, event = None):
@@ -284,21 +252,20 @@ class Bless(S_at):
     
     # Writing to a .txt file (misc) 
     def write_to_file(self, file_name):
-        try:
-            sen = str(self.combo.selection_get())
-            content = sen + '\n'+'\n' + self.stbox.get('1.0', 'end')
+        sen = self.combo.selection_get()
+        if selection := self.stbox.get('1.0', 'end'):
+            content = (
+                f"{sen}\n\n{selection}" if sen else selection
+            )
             with open(file_name, 'w') as the_file:
                 the_file.write(content)
-        except:
-            content = self.stbox.get('1.0', 'end')
-            with open(file_name, 'w') as the_file:
-                the_file.write(content)
+        del sen, selection
     
     # Generate Save as function dialog
     def save_as(self, event = None):
         input_file_name = fil.asksaveasfilename(
             defaultextension=".txt",
-            filetypes=[("All Files", "*.*"), ("Text Documents", "*.txt")]
+            filetypes=[("Text Documents", "*.txt")] #("All Files", "*.*")
         )
         if input_file_name:
             self.write_to_file(input_file_name)
