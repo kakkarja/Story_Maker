@@ -282,12 +282,13 @@ def main():
     pth = Path.home().joinpath("StoryMaker")
     begin = Tk()
     begin.withdraw()
-    ans = mes.askyesno("Blessing Project", "Load story or Create story? (yes to load)")
+    ans = mes.askyesnocancel("Blessing Project", "Load story or Create story? (yes to load)")
     if pth.exists() and bool(list(pth.iterdir())) and ans:
         my_gui = Bless(begin)
         begin.deiconify()
         begin.mainloop()
-    else:
+        main()
+    elif ans == False:
         try:
             from .main_frame import story_maker
         except:
@@ -297,7 +298,11 @@ def main():
             mes.showinfo("No Stories", "No stories exist yet, please make one!")
         begin.destroy()
         story_maker()
-            
+        main()
+    else:
+        begin.destroy()
+
+
 if __name__ == '__main__':
     main()
    
