@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # Copyright © kakkarja (K A K)
 
-from tkinter import Tk, simpledialog
-from .story_structure import BeginningStory, MultipleChoices, MultipleStories, SaveLoadButton
+from tkinter import Tk, simpledialog, messagebox
+from .story_structure import BeginningStory, MultipleChoices, MultipleStories, SaveDeleteButton, StorySelection
 from .story_archive import StoryFilesArchive, StoryFilesLoads
 from pathlib import Path
 from contextlib import chdir
@@ -24,22 +24,23 @@ class MainFrame(Tk):
         }}
         self.title("Story Maker")
         self.scriptures = {"scriptures": ""}
-        self.path = Path("~").expanduser()
+        self.path = Path("~").expanduser().joinpath("StoryMaker")
+        self.checking_dir()
+        self.combo_stories = StorySelection(self, self.path, {"selected": self.load_formats})
         self.beginning = BeginningStory(self)
         self.multiple_choices_first = MultipleChoices(self, "First Multiple Choices")
         self.multiple_stories_first = MultipleStories(self, "First Stories")
         self.multiple_choices_second = MultipleChoices(self, "Second Multiple Choices")
         self.multiple_stories_second = MultipleStories(self, "Second Stories")
-        self.scriptures_ = MultipleStories(self, "Scriptures", True)
-        self.button = SaveLoadButton(self, 
+        self.scriptures_ = MultipleStories(self, "Scriptures")
+        self.button = SaveDeleteButton(self, 
             {
-                "save": self.save_formats, 
-                "load": self.load_formats
+                "save": self.save_formats,
+                "delete": self.delete_zipfile
             }
         )
         self.bind_all("<Control-d>", self.stories_delete)
-        self.name_to_save = ""
-        self.checking_dir()
+        self.name_to_save = None
 
     def _begin_story(self):
         if bg := self.beginning.format_begin():
@@ -87,11 +88,15 @@ class MainFrame(Tk):
         return isinstance(self.scriptures["scriptures"], dict)    
     
     def checking_dir(self):
-        if not self.path.joinpath("StoryMaker").exists():
-            with chdir(self.path):
+        if not self.path.exists():
+            with chdir(self.path.parent):
                 Path("StoryMaker").mkdir()
-        self.path = self.path.joinpath("StoryMaker")
     
+    def _reload_combo(self):
+        self.combo_stories.combo_stories["value"] = [
+            file.name[:-4] for file in self.path.iterdir() if ".zip" in file.name
+        ]
+
     def save_formats(self):
         checking = [
             self.checking_multiple_stories(),
@@ -99,9 +104,16 @@ class MainFrame(Tk):
             self.checking_scriptures()
         ]
         if all(checking):
+            
+            confirm = (
+                messagebox.askyesno(
+                    "Story Maker", f"Save with same file name {self.name_to_save}", parent=self
+                )
+                if self.name_to_save else False
+            )
             ask = (
                 simpledialog.askstring("Story Maker", "Name of file:", parent=self) 
-                if not self.name_to_save else
+                if not confirm else
                 self.name_to_save
             )
             if ask:
@@ -110,10 +122,15 @@ class MainFrame(Tk):
                 with chdir(self.path):
                     archive.archiving_zip(ask)
                 del data, archive
+                messagebox.showinfo(
+                    "Story Maker", f"{self.path.joinpath(ask)}.zip file has been created!", parent=self
+                )
+                self._reload_combo()
 
-    def load_formats(self):
-        ask = simpledialog.askstring("Story Maker", "Name of file:", parent=self)
-        if ask:
+    def load_formats(self, event=None):
+        ask = self.combo_stories.selection_get()
+        self.stories_delete()
+        if ask and self.path.joinpath(f"{ask}.zip").exists():
             stores = []
             with chdir(self.path):
                 stores.extend(StoryFilesLoads(self.path).data_extract(ask))
@@ -125,16 +142,33 @@ class MainFrame(Tk):
             self.scriptures_.insert_text(stores[2]["scriptures"])
             self.name_to_save = ask
             del stores
-        
+        else:
+            if ask:
+                messagebox.showinfo("Story Maker", f"{ask}.zip is not exist!", parent=self)        
 
     def stories_delete(self, event=None):
+        
         self.beginning.delete_text()
         self.multiple_choices_first.delete_all()
         self.multiple_stories_first.delete_all()
         self.multiple_choices_second.delete_all()
         self.multiple_stories_second.delete_all()
         self.scriptures_.delete_all()
-
+    
+    def delete_zipfile(self):
+        if self.name_to_save:
+            ask = messagebox.askokcancel(
+                "Story Maker", f"Do you want to delete this {self.name_to_save}.zip file?", parent=self
+            )
+            if ask:
+                check_path = StoryFilesArchive(self.path)
+                file_path = check_path.path.joinpath(f"{self.name_to_save}.zip") 
+                if file_path.exists():
+                    check_path.delete_zipfile(self.name_to_save)
+                    messagebox.showinfo("Story Maker", f"{file_path} has been deleted!")
+                    self._reload_combo()
+                    self.name_to_save = None
+                del check_path, file_path
 
 def story_maker():
     MainFrame().mainloop()

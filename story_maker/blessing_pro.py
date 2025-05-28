@@ -21,19 +21,15 @@ except:
     from story_archive import StoryFilesLoads, Choices
 
 
-# Class that have no properties yet
-class S_at:
-    pass
-
 # Class that generate Windows console and stories from Blessing_Story folder
-class Bless(S_at):
+class Bless:
     
     def __init__(self,root):
         super().__init__()
         self.asw = None
         self.cycle = 1
         self.root = root
-        root.title("Blessing Project ✟ Story Reader and Maker")
+        root.title("Blessing Devotion Interactive Story ✟ Story Reader and Maker")
         root.geometry("623x720+257+33")
         root.resizable(False,  False)
         
@@ -137,15 +133,11 @@ class Bless(S_at):
         match self.cycle:
             case 1:
                 self.get_ans(self.asw, self.cycle)
-                if self.asw != "C":
-                    self.s_story2()
-                    self.cycle += 1
-                else:
-                    self.cycle += 2
+                self.s_story2()
+                self.cycle += 1
             case 2:
                 self.get_ans(self.asw, self.cycle)
-                if self.asw != "C":
-                    self.s_story3()
+                self.s_story3()
                 self.cycle += 1
         if self.cycle == 3:
             self._set_combo(False)
@@ -153,11 +145,10 @@ class Bless(S_at):
         self._text_conf()
                     
     def _insert_answer(self, part: int, ans: str, sentences: str):
-        ending = "\nThe End" if ans == 'C' else ''
         double = "\n\n" if part == 2 else "\n"
         self.stbox.insert(END, f"{double}Choose: {ans}\n")
-        self.stbox.insert(END, f"\n{sentences}{ending}")
-        del ending, double, part, ans, sentences
+        self.stbox.insert(END, f"\n{sentences}")
+        del double, part, ans, sentences
 
     # Answering function        
     def get_ans(self, ans=None, part=None):
@@ -196,8 +187,11 @@ class Bless(S_at):
 
     # 3rd of a story           
     def s_story3(self):
-         self.stbox.insert(END, f"\n\n{self.docr[2]["scriptures"][self.asw].upper()}")
-    
+        stc = self.docr[2]["scriptures"].get(self.asw)
+        if stc:
+             self.stbox.insert(END, f"\n\n{stc.upper()}")
+        del stc
+
     def _set_combo(self, normal: bool = True):
         state = "normal" if normal else "disabled"
         self.rb1.config(state=state)
@@ -206,9 +200,8 @@ class Bless(S_at):
     
     # Clear function for starting new story afresh    
     def clear(self):
+        self.dele()
         self.docr = []
-        self._text_conf(True)
-        self.stbox.delete("1.0", "end")
         self._set_combo(bool(self.combo.get()))
         self.st1.set(1)
 
@@ -216,6 +209,7 @@ class Bless(S_at):
     def start_story(self,event = None):
         self.clear()
         self.story()
+        self._text_conf(True)
         if self.docr:
             self.s_story1()
         self._text_conf()
@@ -283,12 +277,13 @@ def main():
     begin = Tk()
     begin.withdraw()
     ans = mes.askyesnocancel("Blessing Project", "Load story or Create story? (yes to load)")
-    if pth.exists() and bool(list(pth.iterdir())) and ans:
+    files = bool(list(pth.iterdir())) if pth.exists() else False
+    if pth.exists() and files and ans:
         my_gui = Bless(begin)
         begin.deiconify()
         begin.mainloop()
         main()
-    elif ans == False:
+    elif ans == False or all([ans == True, not files]) :
         try:
             from .main_frame import story_maker
         except:

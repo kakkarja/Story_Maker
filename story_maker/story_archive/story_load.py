@@ -11,8 +11,11 @@ except:
 
 
 class StoryFilesLoads(StoryFilesArchive):
+    """Story loader"""
     
-    def _folder_files(self, name: str):
+    def _folder_files(self, name: str) -> None:
+        """Unarchived zipfile to a folder"""
+        
         pth = self.path.joinpath(name)
         if not pth.exists():
             self.unarchived_zip(name)
@@ -25,7 +28,9 @@ class StoryFilesLoads(StoryFilesArchive):
             del files
         del pth
 
-    def data_extract(self, name: str):
+    def data_extract(self, name: str) -> list:
+        """Extracted data individually to a list"""
+
         self._folder_files(name)
         datas = []
         files = ["stories", "choices", "scriptures"]
@@ -35,13 +40,14 @@ class StoryFilesLoads(StoryFilesArchive):
                 datas.append(json.load(d))
             os.remove(p)
         os.rmdir(self.path.joinpath(name))
+        del files
         return datas
     
 
 if __name__ == "__main__":
 
     path = Path(__file__).parent
-    os.chdir(path=path)
+    #os.chdir(path=path)
     # data = [{"Stories": "..."}, {"choices": "..."}, {"scriptures": "..."}]
     # story = StoryFilesArchive(path, *data)
     # story.archiving_zip("test")
@@ -52,4 +58,4 @@ if __name__ == "__main__":
     # loadstory.unarchived_zip("test")
     # loadstory.deleting_files()
     # StoryFilesArchive(path).deleting_files()
-    print(*StoryFilesLoads(path).data_extract("test"))
+    #print(*StoryFilesLoads(path).data_extract("test"))

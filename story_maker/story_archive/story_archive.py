@@ -115,4 +115,9 @@ class StoryFilesArchive(StoryFilesData):
             with ZipFile(self.path.joinpath(f"{name}.zip")) as zipped:
                 for file in zipped.filelist:
                     zipped.extract(file)
-                    
+    
+    def delete_zipfile(self, name: str):
+        """Deleting a zip file"""
+
+        if is_zipfile(self.path.joinpath(f"{name}.zip")):
+            os.remove(self.path.joinpath(f"{name}.zip"))

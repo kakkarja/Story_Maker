@@ -9,9 +9,8 @@ __all__ = [""]
 class MultipleStories(ttk.LabelFrame):
     """Multiple Stories Results"""
 
-    def __init__(self, root, judul: str, skipped: bool = False):
+    def __init__(self, root, judul: str):
         super().__init__()
-        self.skipped = skipped
 
         self.config(text=judul)
         self.pack(fill="both", expand=1)
@@ -34,14 +33,13 @@ class MultipleStories(ttk.LabelFrame):
         self.text_b.configure(yscrollcommand=self.scrollbar.set)
         self.scrollbar.pack(side="right", fill="y")
 
-        if not self.skipped:
-            self.lif_right_choice = ttk.LabelFrame(self.left_frame, text="C", labelanchor="w")
-            self.lif_right_choice.pack(fill="both", expand=1)
-            self.text_c = Text(self.lif_right_choice, height=1, wrap="word")
-            self.text_c.pack(side="left", fill="both", expand=1)
-            self.scrollbar = ttk.Scrollbar(self.lif_right_choice, orient="vertical", command=self.text_c.yview)
-            self.text_c.configure(yscrollcommand=self.scrollbar.set)
-            self.scrollbar.pack(side="right", fill="y")
+        self.lif_right_choice = ttk.LabelFrame(self.left_frame, text="C", labelanchor="w")
+        self.lif_right_choice.pack(fill="both", expand=1)
+        self.text_c = Text(self.lif_right_choice, height=1, wrap="word")
+        self.text_c.pack(side="left", fill="both", expand=1)
+        self.scrollbar = ttk.Scrollbar(self.lif_right_choice, orient="vertical", command=self.text_c.yview)
+        self.text_c.configure(yscrollcommand=self.scrollbar.set)
+        self.scrollbar.pack(side="right", fill="y")
 
     def format_stories(self) -> (dict[str, str] | None):
 
@@ -49,45 +47,31 @@ class MultipleStories(ttk.LabelFrame):
         self.text_a.get("1.0", "end")[:-1].strip(),
         self.text_b.get("1.0", "end")[:-1].strip(),
         self.text_c.get("1.0", "end")[:-1].strip(),
-        ] if not self.skipped else [
-        self.text_a.get("1.0", "end")[:-1].strip(),
-        self.text_b.get("1.0", "end")[:-1].strip(),
         ]
         if all(stories):
-            if len(stories) == 3:
-                return {
-                    "A": stories[0],
-                    "B": stories[1],
-                    "C": stories[2],
-                }
-            else:
-                return {
-                    "A": stories[0],
-                    "B": stories[1],
-                }
+            return {
+                "A": stories[0],
+                "B": stories[1],
+                "C": stories[2],
+            }
     
     def delete_all(self):
         stories = [
             self.text_a, self.text_b, self.text_c,
-        ] if not self.skipped else [
-            self.text_a, self.text_b,
         ]
-        
         for story in stories:
             story.delete("1.0", "end")
+        del stories
     
     def insert_text(self, format_: dict[str|str]):
         self.delete_all()
         stories = [
             self.text_a, self.text_b, self.text_c,
-        ] if not self.skipped else [
-            self.text_a, self.text_b,
         ]
         sentences = [
-            format_["A"], format_["B"], format_["C"]
-        ] if not self.skipped else [
-            format_["A"], format_["B"]
+            format_.get("A"), format_.get("B"), format_.get("C")
         ]
         for story, sentence in zip(stories, sentences):
-            story.insert("1.0", sentence)
+            if sentence:
+                story.insert("1.0", sentence)
         del stories, sentences
