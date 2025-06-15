@@ -8,7 +8,7 @@ from typing import Any
 
 class StorySelection(ttk.Frame):
 
-    def __init__(self, root, path: Path, command: dict[str|Any] = {"selected": ""}):
+    def __init__(self, root, path: Path):
         super().__init__()
         self.path = path
 
@@ -17,8 +17,64 @@ class StorySelection(ttk.Frame):
         self.combo_frame.pack(fill="both")
 
         self.combo_stories = ttk.Combobox(self.combo_frame, width = 30)
-        self.combo_stories.pack(side="top", pady=3)
-        self.combo_stories.bind("<<ComboboxSelected>>", command["selected"])
+        self.combo_stories.pack(side="top", pady=1)
+        self.combo_stories.bind("<<ComboboxSelected>>", self.combo_select)
         self.combo_stories["value"] = [
-            file.name[:-4] for file in self.path.iterdir() if ".zip" in file.name
+            directory.name for directory in self.path.iterdir() if directory.is_dir()
         ]
+        self.style = ttk.Style()
+        self.style.configure('my.TButton', font=('Helvetica', 20, "bold"), width=1)
+        self.button_frame = ttk.Frame(self)
+        self.button_frame.pack()
+        self.back_button = ttk.Button(self.button_frame, text="<", style="my.TButton", command=self.previous_folder)
+        self.back_button.pack(side="left", padx=(0, 2))
+        self.fwd_button = ttk.Button(self.button_frame, text=">", style="my.TButton", command=self.selected_folder)
+        self.fwd_button.pack(side="left")
+        self.folder = None
+
+    def _reload_combo(self, folder: Path, file: bool = True):
+        self.combo_stories.delete(0, "end")
+        val = [
+            file.name[:-4] for file in folder.iterdir() if ".zip" in file.name
+        ] if file else [
+            directory.name for directory in folder.iterdir() if directory.is_dir()
+        ]
+        self.combo_stories["value"] = val
+        self.path = folder        
+
+    def combo_select(self, event=None):
+        if folder := self.combo_stories.get():
+            if self.path.joinpath(folder).is_dir():
+                self._reload_combo(self.path.joinpath(folder))
+                self.folder = folder
+                del folder
+
+    def previous_folder(self):
+        if self.folder:
+            if self.path.name == self.folder:
+                self._reload_combo(self.path.parent, False)
+    
+    def selected_folder(self):
+        if self.folder:
+            if self.path.joinpath(self.folder).is_dir():
+                self._reload_combo(self.path.joinpath(self.folder))
+    
+    def checking_dir(self):
+        if self.path.name == "StoryMaker":
+            return True
+        return False
+    
+    def reload(self):
+        if self.checking_dir():
+            self._reload_combo(self.path, False)
+        else:
+            self._reload_combo(self.path)
+    
+    def combo_values(self):
+        return bool(self.combo_stories["value"])
+    
+    def del_folder(self):
+        if self.folder and self.path.name == self.folder:
+            if not self.combo_values():
+                self.path.rmdir()
+                self.path = self.path.parent

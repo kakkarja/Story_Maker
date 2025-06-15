@@ -8,3 +8,5 @@ dist/
 Archive*/
 *.icloud
 __pycache__/
+*.txt
+*.zip

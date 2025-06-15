@@ -17,8 +17,10 @@ from pathlib import Path
 from contextlib import chdir
 try:
     from .story_archive import StoryFilesLoads, Choices
+    from .story_structure import StorySelection
 except:
     from story_archive import StoryFilesLoads, Choices
+    from story_structure import StorySelection
 
 
 # Class that generate Windows console and stories from Blessing_Story folder
@@ -27,7 +29,7 @@ class Bless:
     def __init__(self,root):
         super().__init__()
         self.asw = None
-        self.cycle = 1
+        self.cycle = 0
         self.root = root
         root.title("Blessing Devotion Interactive Story ✟ Story Reader and Maker")
         root.geometry("623x720+257+33")
@@ -86,13 +88,9 @@ class Bless:
         self.h_path = Path.home().joinpath("StoryMaker")
                     
         # Create frame, combobox, textbox, scrollbar, and radiobuttons
-        self.combo = ttk.Combobox(root, width = 30)
-        self.combo.pack(side = TOP, pady = 3)
-        self.combo.bind("<<ComboboxSelected>>", self.start_story)
-        self.combo["value"] = sorted([
-            file.name.rpartition(".")[0] for file in self.h_path.iterdir() if ".zip" in file.name
-        ])
-        self.frame = Frame(root)
+        self.combo = StorySelection(self.root, self.h_path)
+        self.combo.combo_stories.bind("<<ComboboxSelected>>", self.choice, add=True)
+        self.frame = Frame(self.root)
         self.frame.pack(side = BOTTOM, fill = BOTH, expand = True)
         self.scr = Scrollbar(self.frame)
         self.scr.pack(side = RIGHT, fill = BOTH, pady = 2, padx = 1)
@@ -103,18 +101,18 @@ class Bless:
         self.stbox.config(
             yscrollcommand=self.scr.set, font=("Avenir", "12", "bold")
         )
-        # self.bttr = Button(root, text = 'Dictionary', command = self.trans, 
+        # self.bttr = Button(self.root, text = 'Dictionary', command = self.trans, 
         #                    relief = 'groove')
         # self.bttr.pack(side='left', padx = 3, pady = 2)
-        self.rb1 = Radiobutton(root, text = 'A', variable=self.st1, 
+        self.rb1 = Radiobutton(self.root, text = 'A', variable=self.st1, 
                             value = 'A', compound='left', 
                             command = self.choice, tristatevalue = 0)
         self.rb1.pack(side='left', expand = True)
-        self.rb2 = Radiobutton(root, text = 'B', variable=self.st1, 
+        self.rb2 = Radiobutton(self.root, text = 'B', variable=self.st1, 
                             value = 'B', compound=LEFT, 
                             command = self.choice, tristatevalue = 0)
         self.rb2.pack(side='left', expand = True)
-        self.rb3 = Radiobutton(root, text = 'C', variable=self.st1, 
+        self.rb3 = Radiobutton(self.root, text = 'C', variable=self.st1, 
                             value = 'C', compound=LEFT, 
                             command = self.choice, tristatevalue = 0)
         self.rb3.pack(side='left', expand = True)
@@ -126,22 +124,40 @@ class Bless:
         else:
             self.stbox.config(state="normal")
 
+    def _running(self):
+        if self.story_run == self.combo.combo_stories.get():
+            return True
+        self.refresh()
+
     # Choices function for choosing A/B/C    
     def choice(self, event = None):
         self._text_conf(True)
-        self.asw = Choices(self.st1.get())
+        self.asw = (
+            Choices(self.st1.get()) if self.st1.get() in ["A", "B", "C"] else ""
+        )
         match self.cycle:
+            case 0:
+                self.story_run = self.combo.combo_stories.get()
+                self.clear()
+                self.story()
+                self._text_conf(True)
+                if self.docr:
+                    self.s_story1()
+                    self.cycle += 1 
+                self._text_conf()
             case 1:
-                self.get_ans(self.asw, self.cycle)
-                self.s_story2()
-                self.cycle += 1
+                if self._running():
+                    self.get_ans(self.asw, self.cycle)
+                    self.s_story2()
+                    self.cycle += 1
             case 2:
-                self.get_ans(self.asw, self.cycle)
-                self.s_story3()
-                self.cycle += 1
+                if self._running():
+                    self.get_ans(self.asw, self.cycle)
+                    self.s_story3()
+                    self.cycle += 1
         if self.cycle == 3:
             self._set_combo(False)
-            self.cycle = 1
+            self.cycle = 0
         self._text_conf()
                     
     def _insert_answer(self, part: int, ans: str, sentences: str):
@@ -162,11 +178,9 @@ class Bless:
     # Filling stories parts into 9 set of class properties    
     def story(self):
 
-        if story := self.combo.get():
-            with chdir(self.h_path):
-                self.docr.extend(StoryFilesLoads(self.h_path).data_extract(story))
-        else:
-            mes.showinfo("Blessing Project", "Please choose story from the list!", parent=self.root)
+        if story := self.combo.combo_stories.get():
+            with chdir(self.combo.path):
+                self.docr.extend(StoryFilesLoads(self.combo.path).data_extract(story))
         
     # Starting first part of a story
     def s_story1(self):
@@ -202,18 +216,9 @@ class Bless:
     def clear(self):
         self.dele()
         self.docr = []
-        self._set_combo(bool(self.combo.get()))
+        self._set_combo(bool(self.combo.combo_stories.get()))
         self.st1.set(1)
 
-    # Start the story
-    def start_story(self,event = None):
-        self.clear()
-        self.story()
-        self._text_conf(True)
-        if self.docr:
-            self.s_story1()
-        self._text_conf()
-    
     # Link to lWW Github page
     def about(self):
         webbrowser.open_new(r"https://github.com/kakkarja/BP")
@@ -239,6 +244,7 @@ class Bless:
         self.select_all()
         self.stbox.event_generate("<<Clear>>")
         self._text_conf()
+        self._set_combo(False)
     
     # Generate Exit Function
     def ex(self, event = None):
@@ -246,7 +252,7 @@ class Bless:
     
     # Writing to a .txt file (misc) 
     def write_to_file(self, file_name):
-        sen = self.combo.selection_get()
+        sen = self.combo.combo_stories.get()
         if selection := self.stbox.get('1.0', 'end'):
             content = (
                 f"{sen}\n\n{selection}" if sen else selection
@@ -266,7 +272,8 @@ class Bless:
     
     # Refresh list of files in BP
     def refresh(self, event = None):
-        self.start_story()
+        self.cycle = 0
+        self.choice()
 
     # Dictionary Function
     def trans(self, event = None):
