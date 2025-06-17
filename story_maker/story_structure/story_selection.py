@@ -40,35 +40,54 @@ class StorySelection(ttk.Frame):
             directory.name for directory in folder.iterdir() if directory.is_dir()
         ]
         self.combo_stories["value"] = val
-        self.path = folder        
+        self.path = folder
+        
+    def _read_only(self, read: bool = True):
+        if read:
+            self.combo_stories.config(state="readonly")
+        else:
+            self.combo_stories.config(state="normal")
 
     def combo_select(self, event=None):
         if folder := self.combo_stories.get():
             if self.path.joinpath(folder).is_dir():
                 self._reload_combo(self.path.joinpath(folder))
+                self._read_only()
                 self.folder = folder
                 del folder
 
     def previous_folder(self):
         if self.folder:
             if self.path.name == self.folder:
+                self._read_only(False)
                 self._reload_combo(self.path.parent, False)
     
     def selected_folder(self):
         if self.folder:
             if self.path.joinpath(self.folder).is_dir():
                 self._reload_combo(self.path.joinpath(self.folder))
+                self._read_only()
     
     def checking_dir(self):
         if self.path.name == "StoryMaker":
             return True
         return False
     
+    def _state_combo_read(self):
+        if str(self.combo_stories.cget("state")) == "readonly":
+            return True
+        return False
+    
     def reload(self):
         if self.checking_dir():
+            if self._state_combo_read():
+                self._read_only(False)
             self._reload_combo(self.path, False)
         else:
+            if self._state_combo_read():
+                self._read_only(False)
             self._reload_combo(self.path)
+            self._read_only()
     
     def combo_values(self):
         return bool(self.combo_stories["value"])
