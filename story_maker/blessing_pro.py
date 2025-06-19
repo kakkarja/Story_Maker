@@ -125,7 +125,7 @@ class Bless:
             self.stbox.config(state="normal")
 
     def _running(self):
-        if self.story_run == self.combo.combo_stories.get():
+        if self.story_run == self.combo.combo_stories.get() and self.asw:
             return True
         self.refresh()
 
@@ -140,11 +140,9 @@ class Bless:
                 self.story_run = self.combo.combo_stories.get()
                 self.clear()
                 self.story()
-                self._text_conf(True)
                 if self.docr:
                     self.s_story1()
-                    self.cycle += 1 
-                self._text_conf()
+                    self.cycle += 1
             case 1:
                 if self._running():
                     self.get_ans(self.asw, self.cycle)
@@ -214,7 +212,7 @@ class Bless:
     
     # Clear function for starting new story afresh    
     def clear(self):
-        self.dele()
+        self._inner_del()
         self.docr = []
         self._set_combo(bool(self.combo.combo_stories.get()))
         self.st1.set(1)
@@ -238,11 +236,14 @@ class Bless:
         self.stbox.event_generate("<<Paste>>")
         self._text_conf()
 
+    def _inner_del(self):
+        self.select_all()
+        self.stbox.event_generate("<<Clear>>")
+
     # Generate Delete Function
     def dele(self, event = None):
         self._text_conf(True)
-        self.select_all()
-        self.stbox.event_generate("<<Clear>>")
+        self._inner_del()
         self._text_conf()
         self._set_combo(False)
     
