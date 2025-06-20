@@ -10,9 +10,9 @@
 * The **delete** button:
   * Delete a file.
   * Folder empty, wil delete the folder.
-* Pressing **<ins>Control + D</ins>** buttons will delete all contents of all fields.
-  * **WARNING!**
-    * <ins>_Be careful not to delete everything before save it._</ins>
+* Pressing ```Ctrl + D``` buttons will delete all contents of all fields.  
+  > **WARNING!**  
+  _Be careful not to delete everything before save it._
 
 **NOTE:**  
 In the folders area, if press **save** button, will create another folder.  
