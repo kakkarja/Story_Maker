@@ -13,6 +13,7 @@
 * Pressing ```Ctrl + D``` buttons will delete all contents of all fields.  
   > **WARNING!**  
   _Be careful not to delete everything before save it._
+* You can edit existing story by click it, and it will loads to the story fields.
 
 **NOTE:**  
 In the folders area, if press **save** button, will create another folder.  
