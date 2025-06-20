@@ -219,7 +219,7 @@ class Bless:
 
     # Link to lWW Github page
     def about(self):
-        webbrowser.open_new(r"https://github.com/kakkarja/BP")
+        webbrowser.open_new(r"https://github.com/kakkarja/Story_Maker")
     
     # Select all text content
     def select_all(self):
