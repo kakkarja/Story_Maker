@@ -8,8 +8,11 @@
 * The **'<'** button is going back to folders area.
 * The **'>'** button is going back to files area.
 * The **delete** button:
-  * Delete a file
-  * Folder empty, wil delete the folder
+  * Delete a file.
+  * Folder empty, wil delete the folder.
+* Pressing **<ins>Control + D</ins>** buttons will delete all contents of all fields.
+  * **WARNING!**
+    * <ins>_Be careful not to delete everything before save it._</ins>
 
 **NOTE:**  
 In the folders area, if press **save** button, will create another folder.  
