@@ -1,5 +1,19 @@
 # Create your devotion story and share to others as blessing ❤️
 
+**Story Maker**  
+
+* Need to create a folder first by pressing the **save** button.
+* Than click the folder.
+  * Inside the empty folder than start to make a story and **save**.
+* The **'<'** button is going back to folders area.
+* The **'>'** button is going back to files area.
+* The **delete** button:
+  * Delete a file
+  * Folder empty, wil delete the folder
+
+**NOTE:**  
+In the folders area, if press **save** button, will create another folder.  
+
 ![starter](pictures/starter.png)
 
 ![devotion](pictures/devotion.png)
