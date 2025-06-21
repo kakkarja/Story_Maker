@@ -10,6 +10,7 @@ requires-python = ">=3.10"
 authors = [{name = "karjakak", email = "kakkarja.github@gmail.com"}]
 description = "Story Maker for devotion and blessing for others."
 readme = "README.md"
+license = "BSD-3-Clause"
 
 classifiers = [
     "Environment :: Win32 (MS Windows)",
@@ -17,6 +18,9 @@ classifiers = [
     "Intended Audience :: End Users/Desktop",
     "Programming Language :: Python :: 3.10",
 ]
+
+[project.urls]
+Homepage = "https://github.com/kakkarja/Story_Maker"
 
 [project.gui-scripts]
 SMD = "story_maker:main"
