@@ -16,7 +16,17 @@
 * You can edit existing story by click it, and it will loads to the story fields.
 
 **NOTE:**  
-In the folders area, if press **save** button, will create another folder.  
+In the folders area, if press **save** button, will create another folder.
+
+**To start Story Maker:**
+
+  ```Terminal
+  # Mac-OS
+  % SMD 
+
+  # Windows
+  > SMD
+  ```
 
 ![starter](pictures/starter.png)
 
