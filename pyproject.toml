@@ -37,4 +37,4 @@ SMD = "story_maker:main"
 where = ["."]
 
 [tool.setuptools.package-data]
-"*" = ["*.png", "*.zip"]
+"*" = ["*.zip"]
