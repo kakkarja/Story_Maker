@@ -180,25 +180,27 @@ class Bless:
             with chdir(self.combo.path):
                 self.docr.extend(StoryFilesLoads(self.combo.path).data_extract(story))
         
+    def _choices(self, begin: bool = True):
+        return [
+            f"{k}. {v}" for k, v in self.docr[1]["choices"]["first" if begin else "second"].items()
+        ]
+   
     # Starting first part of a story
     def s_story1(self):
         self.stbox.insert("1.0", f"{self.docr[0]["stories"]["begin"]}\n\n")
-        for i in [
-            f"{k}. {v}" for k, v in self.docr[1]["choices"]["first"].items()
-        ]:
+        for i in self._choices():
             self.stbox.insert(END, i+'\n')
 
     # 2nd part of a story
     def s_story2(self):
         self.stbox.insert(END, '\n')
-        for i in [
-            f"{k}. {v}" for k, v in self.docr[1]["choices"]["second"].items()
-        ]:
+        for i in self._choices(False):
             self.stbox.insert(END, '\n' + i )
         self.st1.set(1)
 
     # 3rd of a story           
     def s_story3(self):
+
         stc = self.docr[2]["scriptures"].get(self.asw)
         if stc:
              self.stbox.insert(END, f"\n\n{stc.upper()}")
