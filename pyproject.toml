@@ -4,8 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "StoryMaker-karjakak"
-version = "1.0.6"
-
+version = "1.0.7"
 requires-python = ">=3.10"
 authors = [
     {name = "karjakak"}, 
@@ -13,9 +12,14 @@ authors = [
 ]
 description = "Story Maker for devotion and blessing for others."
 readme = "README.md"
-license = "BSD-3-Clause"
-license-files = ["LICENSE"]
-
+license = {file = "LICENSE"}
+keywords = [
+    "Story Maker", 
+    "Interactive Story",
+    "Devotion",
+    "Story Reader",
+    "Stories",
+]
 classifiers = [
     "Environment :: Win32 (MS Windows)",
     "Environment :: MacOS X",
@@ -31,3 +35,6 @@ SMD = "story_maker:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
+
+[tool.setuptools.package-data]
+"*" = ["*.png", "*.zip"]

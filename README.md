@@ -18,6 +18,12 @@
 **NOTE:**  
 In the folders area, if press **save** button, will create another folder.
 
+## Free Stories to start reading
+
+* BlessingPro → 4 stories
+  * In version 1.0.7
+  * **WARNING:** In case of firewall, please move it manually 🙏
+
 **To start Story Maker:**
 
   ```Terminal

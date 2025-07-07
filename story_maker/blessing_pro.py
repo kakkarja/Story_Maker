@@ -282,10 +282,30 @@ class Bless:
     def trans(self, event = None):
         pass
 
+
+def transfer_stories(path: Path):
+    stories_path = Path(__file__).parent.parent.joinpath("stories")
+    if not path.exists():
+        path.mkdir()
+    if stories_path.joinpath("BlessingPro").exists():
+        with chdir(stories_path):
+            stories_path.joinpath("BlessingPro").rename(path.joinpath("BlessingPro"))
+
 def main():
     pth = Path.home().joinpath("StoryMaker")
     begin = Tk()
     begin.withdraw()
+    try:
+        transfer_stories(pth)
+    except:
+        mes.showinfo(
+            "Stories", 
+            (
+                f"Could not transfer folder of stories, please do it manually from {
+                    Path(__file__).parent.parent.joinpath("stories")
+                } to {pth}!"
+            )
+        )
     ans = mes.askyesnocancel("Blessing Project", "Load story or Create story? (yes to load)")
     files = bool(list(pth.iterdir())) if pth.exists() else False
     if pth.exists() and files and ans:
