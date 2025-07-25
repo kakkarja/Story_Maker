@@ -15,17 +15,16 @@ class MainFrame(Tk):
         super().__init__()
         self.stories = {"stories": {
             "begin": None,
-            "first": "",
-            "second": "",
+            "first": None,
+            "second": None,
         }}
         self.choices = {"choices":{
-            "first": "",
-            "second": "",
+            "first": None,
+            "second": None,
         }}
         self.title("Story Maker")
-        self.scriptures = {"scriptures": ""}
+        self.scriptures = {"scriptures": None}
         self.path = Path("~").expanduser().joinpath("StoryMaker")
-        self.checking_dir()
         self.combo_stories = StorySelection(self, self.path)
         self.combo_stories.combo_stories.bind("<<ComboboxSelected>>", self.load_formats, add=True)
         self.beginning = BeginningStory(self)
@@ -87,11 +86,6 @@ class MainFrame(Tk):
     def checking_scriptures(self):
         self._scriptures()
         return isinstance(self.scriptures["scriptures"], dict)    
-    
-    def checking_dir(self):
-        if not self.path.exists():
-            with chdir(self.path.parent):
-                Path("StoryMaker").mkdir()
     
     def _reload_combo(self, load: bool = True):
         if load:

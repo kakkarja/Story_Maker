@@ -13,6 +13,7 @@ from tkinter import (
     messagebox as mes
 )
 import webbrowser
+import shutil
 from pathlib import Path
 from contextlib import chdir
 try:
@@ -200,7 +201,6 @@ class Bless:
 
     # 3rd of a story           
     def s_story3(self):
-
         stc = self.docr[2]["scriptures"].get(self.asw)
         if stc:
              self.stbox.insert(END, f"\n\n{stc.upper()}")
@@ -283,13 +283,15 @@ class Bless:
         pass
 
 
-def transfer_stories(path: Path):
-    stories_path = Path(__file__).parent.parent.joinpath("stories")
-    if not path.exists():
-        path.mkdir()
-    if stories_path.joinpath("BlessingPro").exists():
-        with chdir(stories_path):
-            stories_path.joinpath("BlessingPro").rename(path.joinpath("BlessingPro"))
+def transfer_stories(path: Path, remove: bool = False):
+    stories_path = Path(__file__).parent.joinpath("stories")
+    if stories_path.exists():
+        if not path.exists():
+            path.mkdir()
+        if stories_path.joinpath("BlessingPro").exists() and not path.joinpath("BlessingPro").exists():
+            with chdir(stories_path):
+                shutil.copytree(stories_path.joinpath("BlessingPro"), path.joinpath("BlessingPro"))
+
 
 def main():
     pth = Path.home().joinpath("StoryMaker")
@@ -297,13 +299,13 @@ def main():
     begin.withdraw()
     try:
         transfer_stories(pth)
-    except:
+    except Exception as e:
         mes.showinfo(
             "Stories", 
             (
                 f"Could not transfer folder of stories, please do it manually from {
                     Path(__file__).parent.parent.joinpath("stories")
-                } to {pth}!"
+                } to {pth}\n{e}!"
             )
         )
     ans = mes.askyesnocancel("Blessing Project", "Load story or Create story? (yes to load)")
