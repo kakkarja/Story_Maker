@@ -21,6 +21,11 @@ In the folders area, if press **save** button, will create another folder.
 ## Free Stories to start reading
 
 * BlessingPro → 4 stories
+  
+  * ```Terminal
+    pip3 install -U StoryMaker-karjakak 
+    ```
+
   * In version 1.0.8
   * **WARNING:** In case of firewall, please move it manually 🙏
 
